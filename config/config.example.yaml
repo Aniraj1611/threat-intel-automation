@@ -1,0 +1,145 @@
+# Threat Intelligence Automation Configuration
+# Copy this file to config.yaml and fill in your API keys and settings
+
+# General Settings
+general:
+  log_level: INFO  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  output_directory: output
+  cache_enabled: true
+  cache_ttl: 3600  # seconds
+
+# Collection Settings
+collection:
+  interval_minutes: 60  # How often to collect (for automated runs)
+  lookback_days: 7  # How far back to look for indicators
+  max_iocs_per_source: 10000  # Maximum IOCs to collect per source
+
+# Processing Settings
+processing:
+  min_confidence: 70  # Minimum confidence score (0-100)
+  max_false_positive_rate: 0.15  # Maximum acceptable FP rate (0.0-1.0)
+  staleness_days: 90  # Days before IOC is considered stale
+  dedupe_enabled: true  # Enable deduplication
+
+# Enrichment Settings
+enrichment:
+  mitre_mapping: true  # Enable MITRE ATT&CK mapping
+  threat_actor_attribution: true  # Include threat actor info
+  geolocation: false  # Enable IP geolocation (requires additional API)
+
+# Prioritization Settings
+prioritization:
+  severity_weight: 0.5  # Weight for severity in scoring
+  confidence_weight: 0.3  # Weight for confidence in scoring
+  recency_weight: 0.2  # Weight for recency in scoring
+
+# Threat Intelligence Sources
+sources:
+  # AlienVault Open Threat Exchange
+  alienvault_otx:
+    enabled: true
+    api_key: "YOUR_OTX_API_KEY"  # Get free key at: https://otx.alienvault.com/
+    lookback_days: 7
+    rate_limit_delay: 1.0
+  
+  # AbuseIPDB
+  abuseipdb:
+    enabled: true
+    api_key: "YOUR_ABUSEIPDB_API_KEY"  # Get free key at: https://www.abuseipdb.com/
+    min_confidence: 75
+    rate_limit_delay: 1.0
+  
+  # MISP (Malware Information Sharing Platform)
+  misp:
+    enabled: false  # Set to true if you have MISP instance
+    url: "https://your-misp-instance.org"
+    api_key: "YOUR_MISP_API_KEY"
+    verify_ssl: true
+    lookback_days: 7
+  
+  # Abuse.ch ThreatFox
+  threatfox:
+    enabled: true
+    feed_type: "threatfox"  # threatfox or urlhaus
+    rate_limit_delay: 2.0
+  
+  # Abuse.ch URLhaus
+  urlhaus:
+    enabled: true
+    feed_type: "urlhaus"
+    rate_limit_delay: 2.0
+
+# SIEM Integration Settings
+siem:
+  # Splunk
+  splunk:
+    enabled: false  # Set to true to enable Splunk integration
+    url: "https://splunk.example.com:8088/services/collector"
+    token: "YOUR_SPLUNK_HEC_TOKEN"
+    index: "threat_intel"
+    source: "threat_intel"
+    sourcetype: "threat_intel:ioc"
+    verify_ssl: true
+    batch_size: 100
+  
+  # Elasticsearch / ELK
+  elastic:
+    enabled: false  # Set to true to enable Elastic integration
+    hosts:
+      - "https://elastic.example.com:9200"
+    api_key: "YOUR_ELASTIC_API_KEY"  # Or use username/password
+    # username: "elastic"
+    # password: "YOUR_PASSWORD"
+    index: "threat-intel"
+    verify_ssl: true
+  
+  # IBM QRadar
+  qradar:
+    enabled: false
+    url: "https://qradar.example.com"
+    token: "YOUR_QRADAR_TOKEN"
+    reference_set: "ThreatIntel_IOCs"
+  
+  # Microsoft Sentinel
+  sentinel:
+    enabled: false
+    workspace_id: "YOUR_WORKSPACE_ID"
+    shared_key: "YOUR_SHARED_KEY"
+    log_type: "ThreatIntelligence"
+
+# Export Settings
+export:
+  formats:
+    - json  # Export to JSON format
+    - csv   # Export to CSV format
+    - stix  # Export to STIX 2.1 format
+  
+  # Output paths
+  json_output: "output/iocs.json"
+  csv_output: "output/iocs.csv"
+  stix_output: "output/iocs.stix"
+  cef_output: "output/iocs.cef"
+  leef_output: "output/iocs.leef"
+
+# Reporting Settings
+reporting:
+  enabled: true
+  email_notifications: false
+  email_to:
+    - "soc@example.com"
+  email_from: "threat-intel@example.com"
+  smtp_server: "smtp.example.com"
+  smtp_port: 587
+
+# Performance Settings
+performance:
+  max_workers: 4  # Number of parallel collection threads
+  request_timeout: 30  # HTTP request timeout in seconds
+  max_retries: 3  # Maximum retry attempts for failed requests
+
+# Logging Settings
+logging:
+  file: "logs/threat_intel.log"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
